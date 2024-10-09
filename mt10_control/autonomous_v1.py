@@ -43,7 +43,9 @@ class Autonomous(Node):
         self.right.angular.z = -max_ang_vel
         self.backward.linear.x = -max_lin_vel
 
-        print("Node initialized. Begin.")
+        self.prev_msg = None
+
+        self.get_logger().info("Node initialized. Begin.")
 
     def distance_from_gps(self, lat1, lat2, lon1, lon2):
         #radius of earth in kilometers
@@ -86,15 +88,15 @@ class Autonomous(Node):
         pubbed.data = str(msg)
         bool_pub.data = bool_msg
         self.status_pub.publish(pubbed)
-        print(msg)
+        self.get_logger().info(msg)
         self.autonomous_status.publish(bool_pub)
     
     def coordinates_callback(self, msg: SbgGpsPos):
         self.autonomous_on = True
         self.target_lat = msg.latitude
         self.target_lon = msg.longitude
-        print("Beginning Navigation")
-        print(f"Current distance to target {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
+        self.get_logger().info("Beginning Navigation")
+        self.get_logger().info(f"Current distance to target {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
 
     def autonomous_callback(self):
         if self.autonomous_on == False:
@@ -105,7 +107,7 @@ class Autonomous(Node):
                 self.autonomous_on = False
             
             else:
-                self.rover.publish(self.stop) # Needed for Real Rover
+                #self.rover.publish(self.stop) # Needed for Real Rover
 
                 # distance = haversine_distance(lat, lon, target_lat, target_lon)
                 target_yaw = self.bearing(self.my_lat, self.my_lon, self.target_lat, self.target_lon)
@@ -115,37 +117,43 @@ class Autonomous(Node):
 
                 d_yaw = abs(target_yaw - self.my_yaw)
 
-                self.status_stuff("GPS: ")
-                self.status_stuff(f"lat: {self.my_lat}, lon: {self.my_lon}")
-                self.status_stuff(f"target lat: {self.target_lat}, target lon: {self.target_lon}")
-                self.status_stuff(f"Current distance to target: {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
-                self.status_stuff(f"Current yaw: {self.my_yaw}, target yaw: {target_yaw}")
-                self.status_stuff(f"Angle left: {abs(target_yaw - self.my_yaw)}")
-                self.status_stuff("")
-
                 if d_yaw > 180:
                     d_yaw = 360 - d_yaw
 
                 if d_yaw > 5:
                     if lower_limit < -135 and self.my_yaw > 90:
-                        self.rover.publish(self.left)
-                        self.status_stuff("turning left hard")            
+                        msg = self.left
+                        turn_log = "turning left hard"        
                     elif upper_limit > 135 and self.my_yaw < -90:
-                        self.rover.publish(self.right)
-                        self.status_stuff("turning right hard")
+                        msg = self.right
+                        turn_log = "turning right hard"
                     elif self.my_yaw > upper_limit:
-                        self.rover.publish(self.left)
-                        self.status_stuff("turning left")
+                        msg = self.left
+                        turn_log = "turning left"
                     elif self.my_yaw < lower_limit:
-                        self.rover.publish(self.right)
-                        self.status_stuff("turning right")
+                        msg = self.right
+                        turn_log = "turning right"
                     else:
-                        self.rover.publish(self.forward)
-                        self.status_stuff("forward")
+                        msg = self.forward
+                        turn_log = "forward"
 
                 else:
-                    self.rover.publish(self.forward)
-                    self.status_stuff("forward")
+                    msg = self.forward
+                    turn_log = "forward"
+
+                if msg == self.prev_msg:
+                    pass
+                else:
+                    self.rover.publish(msg)
+                    self.prev_msg = msg
+                    self.status_stuff("GPS: ")
+                    self.status_stuff(f"lat: {self.my_lat}, lon: {self.my_lon}")
+                    self.status_stuff(f"target lat: {self.target_lat}, target lon: {self.target_lon}")
+                    self.status_stuff(f"Current distance to target: {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
+                    self.status_stuff(f"Current yaw: {self.my_yaw}, target yaw: {target_yaw}")
+                    self.status_stuff(f"Angle left: {abs(target_yaw - self.my_yaw)}")
+                    self.status_stuff("")
+                    self.status_stuff(f"{turn_log}")
                         
                 # sleep(0.2)
 
