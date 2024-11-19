@@ -4,21 +4,24 @@ from std_msgs.msg import String, Bool
 from geometry_msgs.msg import Twist
 from sbg_driver.msg import SbgEkfEuler
 from sbg_driver.msg import SbgGpsPos
+from sbg_driver.msg import SbgEkfNav
 from time import sleep
 from math import radians, degrees, sin, cos, asin, sqrt, atan2
 
 
 class Autonomous(Node):
-    def __init__(self, max_lin_vel=45.0, max_ang_vel=7.0, yaw_threshold=10, distance_threshold=1.5):
+    def __init__(self, max_lin_vel=69.0, max_ang_vel=7.0, yaw_threshold=10, distance_threshold=0.5):
         super().__init__("autonomous")
         self.autonomous = self.create_subscription(SbgGpsPos, "/coordinates", self.coordinates_callback, 10)
         self.rover = self.create_publisher(Twist, "/cmd_vel", 10)
         self.gps = self.create_subscription(SbgGpsPos, "/sbg/gps_pos", self.gps_callback, 10)
+        # self.gps = self.create_subscription(SbgEkfNav, "/sbg/ekf_nav", self.gps_callback, 10)
         self.orientation = self.create_subscription(SbgEkfEuler, "/sbg/ekf_euler", self.orientation_callback, 10)
         self.status_pub = self.create_publisher(String, "/status", 10)
         self.autonomous_status = self.create_publisher(Bool, "/autonomous_status", 10)
         self.status_timer = self.create_timer(0.5, self.status_stuff)
         self.autonomous_timer = self.create_timer(0.2, self.autonomous_callback)
+        self.log_timer = self.create_timer(0.2, self.log_callback)
 
         self.autonomous_on = False
 
@@ -42,6 +45,8 @@ class Autonomous(Node):
         self.left.angular.z = max_ang_vel
         self.right.angular.z = -max_ang_vel
         self.backward.linear.x = -max_lin_vel
+        self.stop.linear.x = 0.0
+        self.stop.linear.z = 0.0
 
         self.prev_msg = None
 
@@ -70,6 +75,7 @@ class Autonomous(Node):
         return degrees(atan2(sin(d_lon) * cos(target_lat), cos(curr_lat) * sin(target_lat) - (sin(curr_lat) * cos(target_lat) * cos(d_lon))))
 
     def gps_callback(self, msg: SbgGpsPos):
+    #def gps_callback(self, msg: SbgEkfNav):
         self.my_lat = msg.latitude
         self.my_lon = msg.longitude
 
@@ -88,15 +94,22 @@ class Autonomous(Node):
         pubbed.data = str(msg)
         bool_pub.data = bool_msg
         self.status_pub.publish(pubbed)
-        self.get_logger().info(msg)
+        if msg != None:
+            self.get_logger().info(msg)
         self.autonomous_status.publish(bool_pub)
     
     def coordinates_callback(self, msg: SbgGpsPos):
+    # def coordinates_callback(self, msg: SbgEkfNav):
         self.autonomous_on = True
         self.target_lat = msg.latitude
         self.target_lon = msg.longitude
         self.get_logger().info("Beginning Navigation")
         self.get_logger().info(f"Current distance to target {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
+        
+    def log_callback(self):
+        if self.autonomous_on == True:
+            self.get_logger().info(f"Distance to coordinate {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
+            self.get_logger().info(f"lat: {self.my_lat}, lon: {self.my_lon}")
 
     def autonomous_callback(self):
         if self.autonomous_on == False:
@@ -105,9 +118,9 @@ class Autonomous(Node):
             if self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon) < self.distance_threshold:
                 print("Reached position")
                 self.autonomous_on = False
-            
+                self.rover.publish(self.stop)
             else:
-                #self.rover.publish(self.stop) # Needed for Real Rover
+               #  self.rover.publish(self.stop) # Needed for Real Rover
 
                 # distance = haversine_distance(lat, lon, target_lat, target_lon)
                 target_yaw = self.bearing(self.my_lat, self.my_lon, self.target_lat, self.target_lon)

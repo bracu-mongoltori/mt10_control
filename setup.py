@@ -25,7 +25,11 @@ setup(
         'console_scripts': [
             'diff_drive = mt10_control.diff_drive:main',
             'autonomous = mt10_control.autonomous_v1:main',
-            'gps_pub = mt10_control.gps_pub:main'
+            'gps_pub = mt10_control.gps_pub:main',
+            "joy_node = mt10_control.joy_node:main",
+            "joy_jesan= mt10_control.getVelocity:main",
+            "autonomous_v2= mt10_control.autonomous_v2:main",
+            "aruco_tracker = mt10_control.aruco_tracker:main"
 
         ],
     },

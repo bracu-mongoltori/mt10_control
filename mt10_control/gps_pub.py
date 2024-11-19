@@ -2,12 +2,14 @@ import rclpy
 from rclpy.node import Node 
 from std_msgs.msg import String, Bool
 from sbg_driver.msg import SbgGpsPos
+from sbg_driver.msg import SbgEkfNav
 from time import sleep
 
 class GPSSender(Node):
     def __init__(self) -> None:
         super().__init__("gps_sender")
         self.gps = self.create_publisher(SbgGpsPos, "/coordinates", 10)
+        # self.gps = self.create_publisher(SbgEkfNav, "/coordinates", 10)
         self.check_autonomous = self.create_subscription(Bool, "/autonomous_status", self.checker_callback, 10)
         self.status = False
 
@@ -22,6 +24,7 @@ class GPSSender(Node):
             target_lon = float(input("Enter Target Longitude >"))
 
             nav_msg = SbgGpsPos()
+            # nav_msg = SbgEkfNav()
             nav_msg.latitude = target_lat
             nav_msg.longitude = target_lon
 
