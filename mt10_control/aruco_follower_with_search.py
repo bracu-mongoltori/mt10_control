@@ -61,7 +61,8 @@ class ArucoTrackingNode(Node):
         self.search = True
         self.visited_tag = []
         self.hexagon_vertices = []
-        
+        self.in_transit = False
+
         self.get_logger().info('ArUco Tracking Node initialized')
 
     def calculate_distance(self, marker_center, image_center, marker_size_pixels):
@@ -151,8 +152,11 @@ class ArucoTrackingNode(Node):
         
         corners, ids, _ = aruco.detectMarkers(gray, self.aruco_dict, parameters=self.parameters)
         rect_bounds = self.draw_guides(frame, display_frame)
-        
-        
+
+        # ignotes ids that are already detected
+        for id_index in range(len(ids)):
+            if ids[id_index] in self.visited_tag:
+                ids.pop(id_index)
         
         if ids is not None:
             for i in range(len(ids)):
