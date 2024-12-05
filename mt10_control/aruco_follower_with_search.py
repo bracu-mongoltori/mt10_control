@@ -3,6 +3,7 @@ import numpy as np
 from cv2 import aruco
 import rclpy
 from rclpy.node import Node
+from std_msgs.msg import String, bool
 from geometry_msgs.msg import Twist
 from sbg_driver.msg import SbgEkfEuler
 from sbg_driver.msg import SbgGpsPos
@@ -43,7 +44,10 @@ class ArucoTrackingNode(Node):
         # Create timer for camera callback
         self.timer = self.create_timer(0.01, self.camera_callback)  # 10Hz
         self.gps = self.create_subscription(SbgGpsPos, "/sbg/gps_pos", self.gps_callback, 10)
-        self.orientation = self.create_subscription(SbgEkfEuler, "/sbg/orientation", self.orientation_callback, 10)
+        self.orientation = self.create_subscription(SbgEkfEuler, "/sbg/ekf_euler", self.orientation_callback, 10)
+        self.gps = self.create_publisher(SbgGpsPos, "/coordinates", 10)
+        self.point_status = self.create_subscription(String, "/point_status", self.point_status_callback, 10)
+        
         
         self.my_lat = 0.0
         self.my_lon = 0.0
@@ -54,6 +58,9 @@ class ArucoTrackingNode(Node):
         self.prev_msg = None
         self.mode = None
         self.prev_yaw = None
+        self.search = True
+        self.visited_tag = []
+        self.hexagon_vertices = []
         
         self.get_logger().info('ArUco Tracking Node initialized')
 
@@ -97,13 +104,14 @@ class ArucoTrackingNode(Node):
         else:
             return "Move Forward"
 
-    def publish_movement_command(self, instruction):
+    def publish_movement_command(self, instruction, ids):
         msg = Twist()
         
         if instruction == "Stop":
             msg.linear.x = 0.0
             msg.angular.z = 0.0
             self.goal_reached = True
+            self.visited_tag.append(ids)
             self.get_logger().info('Goal reached! Stopping robot.')
         else:
             if instruction == "Move Forward":
@@ -127,6 +135,10 @@ class ArucoTrackingNode(Node):
             vertex_lon = lon + degrees(delta_lon)
             vertices.append((vertex_lat, vertex_lon))
         return vertices
+    
+    def point_status_callback(self, msg: String):
+        if msg.data == "Reached":
+            self.search = True
 
     def camera_callback(self):
         ret, frame = self.cap.read()
@@ -140,6 +152,8 @@ class ArucoTrackingNode(Node):
         corners, ids, _ = aruco.detectMarkers(gray, self.aruco_dict, parameters=self.parameters)
         rect_bounds = self.draw_guides(frame, display_frame)
         
+        
+        
         if ids is not None:
             for i in range(len(ids)):
                 marker_corners = corners[i][0]
@@ -148,30 +162,43 @@ class ArucoTrackingNode(Node):
                 distance = self.calculate_distance(marker_center, frame.shape[:2], marker_width_pixels)
                 instruction = self.get_movement_instruction(marker_center, rect_bounds, distance)
                 self.get_logger().info(f'Distance: {distance:.2f}m, Instruction: {instruction}')
-                self.publish_movement_command(instruction)
+                self.publish_movement_command(instruction, ids[i])
                 aruco.drawDetectedMarkers(display_frame, corners)
                 cv2.putText(display_frame, f"ID: {ids[i][0]} Distance: {distance:.2f}m", 
                             (10, 30 + i * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         else:
             # Handle no marker detected (360 search logic)
-            msg = Twist()
-            if self.mode != "rotating":
-                self.get_logger().info("AR tag not found. Initiating 360-degree search.")
-                self.mode = "rotating"
-                self.prev_yaw = self.my_yaw  # Record starting yaw
-            
-            yaw_diff = (self.my_yaw - self.prev_yaw + 360) % 360
-            if yaw_diff < 355:
-                msg.angular.z = ANGULAR_SPEED
-                self.get_logger().info(f"Rotating... Current yaw: {self.my_yaw:.2f}, Yaw diff: {yaw_diff:.2f}")
-            else:
-                self.get_logger().info("360-degree search complete. AR tag not found.")
-                self.mode = None
-                msg.angular.z = 0.0
-            
-            if msg != self.prev_msg:
-                self.vel_publisher.publish(msg)
-                self.prev_msg = msg
+            if self.search == True:
+                msg = Twist()
+                if self.mode != "rotating":
+                    self.get_logger().info("AR tag not found. Initiating 270-degree search.")
+                    self.mode = "rotating"
+                    self.prev_yaw = self.my_yaw  # Record starting yaw
+                
+                yaw_diff = (self.my_yaw - self.prev_yaw + 360) % 360
+                if yaw_diff < 270:
+                    msg.angular.z = -ANGULAR_SPEED
+                    self.get_logger().info(f"Rotating... Current yaw: {self.my_yaw:.2f}, Yaw diff: {yaw_diff:.2f}")
+                else:
+                    self.get_logger().info("270-degree search complete. AR tag not found.")
+                    self.mode = "point follow"
+                    msg.angular.z = 0.0
+                    self.search = False
+                
+                if msg != self.prev_msg:
+                    self.vel_publisher.publish(msg)
+                    self.prev_msg = msg
+                    
+            elif self.mode == "point follow":
+                self.get_logger().info("Following hexagon points.")
+                if self.hexagon_vertices is []:
+                    self.hexagon_vertices = self.calculate_hexagon_vertices(self.my_lat, self.my_lon)
+                nav_msg = SbgGpsPos()
+                nav_msg.latitude = self.hexagon_vertices[0][0]
+                nav_msg.longitude = self.hexagon_vertices[0][1]
+                self.gps.publish(nav_msg)
+                self.hexagon_vertices.pop(0)
+                
 
         cv2.imshow('ArUco Marker Detection', display_frame)
         cv2.waitKey(1)
