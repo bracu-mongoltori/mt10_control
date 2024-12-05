@@ -140,8 +140,12 @@ class ArucoTrackingNode(Node):
     def point_status_callback(self, msg: String):
         if msg.data == "Reached":
             self.search = True
+            self.in_transit = False
 
     def camera_callback(self):
+        if self.in_transit:
+            return
+
         ret, frame = self.cap.read()
         if not ret:
             self.get_logger().error('Failed to capture frame')
@@ -202,6 +206,7 @@ class ArucoTrackingNode(Node):
                 nav_msg.latitude = self.hexagon_vertices[0][0]
                 nav_msg.longitude = self.hexagon_vertices[0][1]
                 self.gps.publish(nav_msg)
+                self.in_transit = True
                 self.hexagon_vertices.pop(0)
                 
 
