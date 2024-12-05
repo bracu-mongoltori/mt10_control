@@ -22,6 +22,8 @@ class Autonomous(Node):
         self.status_timer = self.create_timer(0.5, self.status_stuff)
         self.autonomous_timer = self.create_timer(0.2, self.autonomous_callback)
         self.log_timer = self.create_timer(0.2, self.log_callback)
+        self.point_status = self.create_publisher(String, "/point_status", 10)
+
 
         self.autonomous_on = False
 
@@ -117,6 +119,7 @@ class Autonomous(Node):
         else:
             if self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon) < self.distance_threshold:
                 print("Reached position")
+                self.point_status.publish("Reached")
                 self.autonomous_on = False
                 self.rover.publish(self.stop)
             else:
