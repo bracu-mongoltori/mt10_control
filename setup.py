@@ -29,7 +29,7 @@ setup(
             "joy_node = mt10_control.joy_node:main",
             "joy_jesan= mt10_control.getVelocity:main",
             "autonomous_v2= mt10_control.autonomous_v2:main",
-            "aruco_tracker = mt10_control.aruco_tracker:main"
+            "aruco_tracker = mt10_control.aruco_follower:main",
 
         ],
     },

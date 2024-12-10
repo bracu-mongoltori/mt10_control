@@ -240,7 +240,7 @@ class ArucoTrackingNode(Node):
                 self.hexagon_vertices.pop(0)
                 
 
-        cv2.imshow('ArUco Marker Detection', display_frame)
+        #cv2.imshow('ArUco Marker Detection', display_frame)
         cv2.waitKey(1)
 
     def __del__(self):

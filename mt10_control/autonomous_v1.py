@@ -19,9 +19,9 @@ class Autonomous(Node):
         self.orientation = self.create_subscription(SbgEkfEuler, "/sbg/ekf_euler", self.orientation_callback, 10)
         self.status_pub = self.create_publisher(String, "/status", 10)
         self.autonomous_status = self.create_publisher(Bool, "/autonomous_status", 10)
-        self.status_timer = self.create_timer(0.5, self.status_stuff)
+        self.status_timer = self.create_timer(0.2, self.status_stuff)
         self.autonomous_timer = self.create_timer(0.2, self.autonomous_callback)
-        self.log_timer = self.create_timer(0.2, self.log_callback)
+        #self.log_timer = self.create_timer(0.2, self.log_callback)
         self.point_status = self.create_publisher(String, "/point_status", 10)
 
 
@@ -108,18 +108,16 @@ class Autonomous(Node):
         self.get_logger().info("Beginning Navigation")
         self.get_logger().info(f"Current distance to target {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
         
-    def log_callback(self):
-        if self.autonomous_on == True:
-            self.get_logger().info(f"Distance to coordinate {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
-            self.get_logger().info(f"lat: {self.my_lat}, lon: {self.my_lon}")
 
     def autonomous_callback(self):
         if self.autonomous_on == False:
             pass
         else:
             if self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon) < self.distance_threshold:
+                msg = String()
+                msg.data = "Reached"
                 print("Reached position")
-                self.point_status.publish("Reached")
+                self.point_status.publish(msg)
                 self.autonomous_on = False
                 self.rover.publish(self.stop)
             else:
@@ -158,6 +156,14 @@ class Autonomous(Node):
                     turn_log = "forward"
 
                 if msg == self.prev_msg:
+                    self.status_stuff("GPS: ")
+                    self.status_stuff(f"lat: {self.my_lat}, lon: {self.my_lon}")
+                    self.status_stuff(f"target lat: {self.target_lat}, target lon: {self.target_lon}")
+                    self.status_stuff(f"Current distance to target: {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
+                    self.status_stuff(f"Current yaw: {self.my_yaw}, target yaw: {target_yaw}")
+                    self.status_stuff(f"Angle left: {abs(target_yaw - self.my_yaw)}")
+                    self.status_stuff("")
+                    self.status_stuff(f"{turn_log}")
                     pass
                 else:
                     self.rover.publish(msg)
