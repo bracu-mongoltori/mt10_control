@@ -18,7 +18,7 @@ ANGULAR_SPEED = 7.0 # Turning speed
 STOP_DISTANCE = 0.5 # Distance threshold in meters
 
 class ArucoTracker(Node):
-    def __init__(self, max_lin_vel=45.0, max_ang_vel=6.0):
+    def __init__(self, max_lin_vel=45.0, max_ang_vel=7.0):
         super().__init__("aruco_tracker")
         self.rover = self.create_publisher(Twist, "/cmd_vel", 10)
         self.orientation = self.create_subscription(SbgEkfEuler, "/sbg/ekf_euler", self.orientation_callback, 10)
@@ -42,7 +42,7 @@ class ArucoTracker(Node):
         self.right.angular.z = -max_ang_vel
         self.backward.linear.x = -max_lin_vel
 
-        self.cap = cv2.VideoCapture(1)
+        self.cap = cv2.VideoCapture(2)
         self.marker_center = [0]
         self.distance = 0.0
         self.dir_msg = "None"
