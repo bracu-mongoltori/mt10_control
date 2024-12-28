@@ -33,6 +33,7 @@ setup(
             "autonomous_v2= mt10_control.autonomous_v2:main",
             "aruco_tracker = mt10_control.aruco_follower:main",
             "dummy = mt10_control.dummy_sbg:main",
+            "ar_fixed = mt10_control.ar_fixed:main",
         ],
     },
 )
