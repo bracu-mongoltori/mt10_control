@@ -34,6 +34,7 @@ setup(
             "aruco_tracker = mt10_control.aruco_follower:main",
             "dummy = mt10_control.dummy_sbg:main",
             "ar_fixed = mt10_control.ar_fixed:main",
+            "test = mt10_control.test:main",
         ],
     },
 )
