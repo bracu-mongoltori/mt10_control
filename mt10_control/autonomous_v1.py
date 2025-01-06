@@ -13,16 +13,17 @@ class Autonomous(Node):
     def __init__(self, max_lin_vel=69.0, max_ang_vel=7.0, yaw_threshold=10, distance_threshold=0.5):
         super().__init__("autonomous")
         self.autonomous = self.create_subscription(SbgGpsPos, "/coordinates", self.coordinates_callback, 10)
+        self.autonomous = self.create_subscription(String, "/target_name", self.coordinates_name_callback, 10)
         self.rover = self.create_publisher(Twist, "/cmd_vel", 10)
         self.gps = self.create_subscription(SbgGpsPos, "/sbg/gps_pos", self.gps_callback, 10)
         # self.gps = self.create_subscription(SbgEkfNav, "/sbg/ekf_nav", self.gps_callback, 10)
         self.orientation = self.create_subscription(SbgEkfEuler, "/sbg/ekf_euler", self.orientation_callback, 10)
         self.status_pub = self.create_publisher(String, "/status", 10)
-        self.autonomous_status = self.create_publisher(Bool, "/autonomous_status", 10)
+        self.ar_resume = self.create_publisher(String, "/continue_search", 10)
+        self.autonomous_status = self.create_publisher(String, "/autonomous_status", 10)
         self.status_timer = self.create_timer(0.2, self.status_stuff)
         self.autonomous_timer = self.create_timer(0.2, self.autonomous_callback)
         #self.log_timer = self.create_timer(0.2, self.log_callback)
-        self.point_status = self.create_publisher(String, "/point_status", 10)
 
 
         self.autonomous_on = False
@@ -33,6 +34,8 @@ class Autonomous(Node):
 
         self.target_lat = 0.0
         self.target_lon = 0.0
+        
+        self.target_name = ""
 
         self.yaw_threshold = yaw_threshold
         self.distance_threshold = distance_threshold
@@ -87,18 +90,12 @@ class Autonomous(Node):
 
     def status_stuff(self, msg=None):
         pubbed = String()
-        bool_pub = Bool()
         if self.autonomous_on == False:
-            bool_msg = False
             msg = "Rover autonomous navigation not active"
-        else:
-            bool_msg = True
         pubbed.data = str(msg)
-        bool_pub.data = bool_msg
         self.status_pub.publish(pubbed)
         if msg != None:
             self.get_logger().info(msg)
-        self.autonomous_status.publish(bool_pub)
     
     def coordinates_callback(self, msg: SbgGpsPos):
     # def coordinates_callback(self, msg: SbgEkfNav):
@@ -108,6 +105,11 @@ class Autonomous(Node):
         self.get_logger().info("Beginning Navigation")
         self.get_logger().info(f"Current distance to target {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
         
+    def coordinates_name_callback(self, msg: String):
+        self.get_logger().info(f"Target Name: {msg.data}")
+        self.target_name = msg.data
+        
+        
 
     def autonomous_callback(self):
         if self.autonomous_on == False:
@@ -115,9 +117,16 @@ class Autonomous(Node):
         else:
             if self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon) < self.distance_threshold:
                 msg = String()
-                msg.data = "Reached"
+                msg.data = "reached"
                 print("Reached position")
-                self.point_status.publish(msg)
+                if self.target_name == "4_point_travel":
+                    self.ar_resume.publish(String(data="continue"))
+                if self.target_name == "AR":
+                    self.ar_resume.publish(String(data="continue"))
+                if self.target_name == "GNSS":
+                    self.autonomous_status.publish(msg)
+                # if self.target_name == "mallet":
+                #     self.mallet_resume.publish(String(data="continue"))
                 self.autonomous_on = False
                 self.rover.publish(self.stop)
             else:
@@ -156,6 +165,7 @@ class Autonomous(Node):
                     turn_log = "forward"
 
                 if msg == self.prev_msg:
+                    print(msg)
                     self.status_stuff("GPS: ")
                     self.status_stuff(f"lat: {self.my_lat}, lon: {self.my_lon}")
                     self.status_stuff(f"target lat: {self.target_lat}, target lon: {self.target_lon}")
@@ -168,6 +178,7 @@ class Autonomous(Node):
                 else:
                     self.rover.publish(msg)
                     self.prev_msg = msg
+                    print(msg)
                     self.status_stuff("GPS: ")
                     self.status_stuff(f"lat: {self.my_lat}, lon: {self.my_lon}")
                     self.status_stuff(f"target lat: {self.target_lat}, target lon: {self.target_lon}")
