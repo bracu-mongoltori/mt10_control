@@ -24,7 +24,7 @@ class ArucoSearchTrackNode(Node):
         
         # Publishers
         self.vel_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.detection_status_pub = self.create_publisher(Bool, '/aruco_detection_status', 1)
+        self.detection_status_pub = self.create_publisher(Bool, '/aruco_detection_status', 10)
         
         # Subscribers
         self.orientation = self.create_subscription(
@@ -34,9 +34,9 @@ class ArucoSearchTrackNode(Node):
             String, "/continue_search", self.continue_callback, 10
         )
         
-        self.target_reached_pub = self.create_publisher(String, '/coordinates', 1)
+        self.target_reached_pub = self.create_publisher(String, '/autonomous_status', 10)
         
-        self.point_publish_cmd = self.create_publisher(String, '/point_publish_cmd', 1)
+        self.point_publish_cmd = self.create_publisher(String, '/point_publish_cmd', 10)
         
         # Initialize video capture
         self.cap = cv2.VideoCapture(2)
@@ -132,8 +132,10 @@ class ArucoSearchTrackNode(Node):
             self.start_yaw = self.my_yaw
         msg = Twist()
         msg.angular.z = -ANGULAR_SPEED
-        self.vel_publisher.publish(msg)
-    
+        if msg!=self.prev_msg:
+            self.prev_msg= msg
+            self.vel_publisher.publish(msg)
+                
     def publish_movement_command(self, instruction):
         msg = Twist()
         
@@ -180,7 +182,9 @@ class ArucoSearchTrackNode(Node):
             elif self.last_instruction == "Move Right":
                 self.get_logger().info('ArUco temporarily lost, continuing right turn')
                 msg.angular.z = -ANGULAR_SPEED
-            self.vel_publisher.publish(msg)
+            if msg!= self.prev_msg:
+                self.prev_msg = msg
+                self.vel_publisher.publish(msg)
             return True
         else:
             # If we've exceeded the timeout, stop and switch to detection
@@ -203,6 +207,7 @@ class ArucoSearchTrackNode(Node):
         current_time = time.time()
         
         if self.state == "WAITING":
+            self.get_logger().info("Waiting...")
             # Just update display, no movement
             if ids is not None:
                 aruco.drawDetectedMarkers(display_frame, corners)
@@ -212,14 +217,16 @@ class ArucoSearchTrackNode(Node):
                 self.state = "TRACKING"
                 self.last_tracking_time = current_time
                 self.get_logger().info('ArUco detected, starting tracking')
-            elif current_time - self.detection_start_time >= 5.0:
+            elif current_time - self.detection_start_time >= 3.0:
                 self.start_rotation()
                 self.detection_start_time = current_time
         
         elif self.state == "ROTATING":
             if self.start_yaw is not None:
                 angle_diff = ((self.my_yaw - self.start_yaw) + 360) % 360
-                if angle_diff >= 60.0:
+                self.get_logger().info(f"Angle diff= {angle_diff}")
+                self.get_logger().info(f"Total rotation= {self.total_rotation}")
+                if angle_diff >= 60.0 and angle_diff< 350.0:
                     self.total_rotation += 60.0
                     if self.total_rotation >= 360.0:
                         self.get_logger().info('360 rotation done, ArUco not found. Waiting for next decision.')
