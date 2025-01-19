@@ -20,6 +20,8 @@ class Autonomous(Node):
         self.orientation = self.create_subscription(SbgEkfEuler, "/sbg/ekf_euler", self.orientation_callback, 10)
         self.status_pub = self.create_publisher(String, "/status", 10)
         self.ar_resume = self.create_publisher(String, "/continue_search", 10)
+        self.mallet_resume = self.create_publisher(String, "/continue_search", 10)
+        self.bottle_resume = self.create_publisher(String, "/continue_search", 10)
         self.autonomous_status = self.create_publisher(String, "/autonomous_status", 10)
         self.status_timer = self.create_timer(0.2, self.status_stuff)
         self.autonomous_timer = self.create_timer(0.2, self.autonomous_callback)
@@ -125,8 +127,10 @@ class Autonomous(Node):
                     self.ar_resume.publish(String(data="continue"))
                 if self.target_name == "GNSS":
                     self.autonomous_status.publish(msg)
-                # if self.target_name == "mallet":
-                #     self.mallet_resume.publish(String(data="continue"))
+                if self.target_name == "mallet":
+                    self.mallet_resume.publish(String(data="continue"))
+                if self.target_name == "bottle":
+                    self.bottle_resume.publish(String(data="continue"))
                 self.autonomous_on = False
                 self.rover.publish(self.stop)
             else:
