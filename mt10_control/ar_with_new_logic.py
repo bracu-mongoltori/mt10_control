@@ -39,7 +39,7 @@ class ArucoSearchTrackNode(Node):
         self.point_publish_cmd = self.create_publisher(String, '/point_publish_cmd', 10)
         
         # Initialize video capture
-        self.cap = cv2.VideoCapture(2)
+        self.cap = cv2.VideoCapture(0)
         self.cap.set(cv2.CAP_PROP_FPS, 60)
         
         # Load ArUco dictionary and parameters

@@ -12,7 +12,7 @@ from math import radians, degrees, sin, cos, asin, sqrt, atan2
 class Autonomous(Node):
     def __init__(self, max_lin_vel=69.0, max_ang_vel=7.0, yaw_threshold=10, distance_threshold=0.5):
         super().__init__("autonomous")
-        self.autonomous = self.create_subscription(SbgGpsPos, "/coordinates", self.coordinates_callback, 10)
+        self.autonomous = self.create_subscription(SbgGpsPos, "/coord_pub", self.coordinates_callback, 10)
         self.autonomous = self.create_subscription(String, "/target_name", self.coordinates_name_callback, 10)
         self.rover = self.create_publisher(Twist, "/cmd_vel", 10)
         self.gps = self.create_subscription(SbgGpsPos, "/sbg/gps_pos", self.gps_callback, 10)

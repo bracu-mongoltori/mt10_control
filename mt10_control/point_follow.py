@@ -15,8 +15,8 @@ class GPSSquareNode(Node):
         )
         
         self.point_publish_cmd = self.create_subscription(String, '/point_publish_cmd', self.point_publish_cmd_callback, 10)
-        self.point_publisher = self.create_publisher(SbgGpsPos, '/coordinates', 1)
-        self.point_name_pub = self.create_publisher(String, '/target_name', 1)
+        self.point_publisher = self.create_publisher(SbgGpsPos, '/coord_pub', 10)
+        self.point_name_pub = self.create_publisher(String, '/target_name', 10)
         self.square_points = []  # Array to store the square points
         self.side_length = 4.0  # Side length of the square in meters
         self.EARTH_RADIUS = 6371000.0  # Earth radius in meters

@@ -2,15 +2,16 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from sbg_driver.msg import SbgGpsPos
-from rclpy.qos import QoSProfile, ReliabilityPolicy
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 
 
 class GNSSPublisher(Node):
     def __init__(self):
         super().__init__("gnss_publisher")
-        qos_profile = QoSProfile(reliability=ReliabilityPolicy.RELIABLE)
-        self.gnss_publisher = self.create_publisher(SbgGpsPos, "/coordinates", 10,qos_profile)
-        self.target_publisher = self.create_publisher(String, "/target_name", 10)
+        qos_profile = QoSProfile(reliability=QoSReliabilityPolicy.RELIABLE,history=QoSHistoryPolicy.KEEP_ALL,depth=10)
+        #self.gnss_publisher = self.create_publisher(SbgGpsPos, "/coordinates", 10,qos_profile)
+        self.gnss_publisher = self.create_publisher(SbgGpsPos, "/coord_pub", qos_profile=qos_profile)
+        self.target_publisher = self.create_publisher(String, "/target_name", qos_profile=qos_profile)
         self.gnss_result = self.create_subscription(
             String, "/autonomous_status", self.reached_callback, 10
         )
@@ -20,7 +21,7 @@ class GNSSPublisher(Node):
 
     def load_gnss_points(self):
         with open(
-            "/home/mt/mt_ws/src/mt10_control/mt10_control/gnss_points.txt", "r"
+            "/home/kage/ros2_ws/src/mt10_control/mt10_control/gnss_points.txt", "r"
         ) as file:
             next(file)
             for line in file:
