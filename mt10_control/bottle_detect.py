@@ -12,9 +12,9 @@ from math import degrees
 # Constants from original code
 RECT_WIDTH = 150
 RECT_HEIGHT = 90
-LINEAR_SPEED = 50.0
-ANGULAR_SPEED = 4.5
-STOP_DISTANCE = 0.4
+LINEAR_SPEED = 70.0
+ANGULAR_SPEED = 17.5
+STOP_DISTANCE = 1.0
 TRACKING_TIMEOUT = 1.5  # Tolerance time in seconds for losing object while tracking
 
 class YOLOSearchTrackNode(Node):
