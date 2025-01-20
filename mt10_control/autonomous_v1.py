@@ -129,9 +129,9 @@ class Autonomous(Node):
                     self.ar_resume.publish(String(data="continue"))
                 if self.target_name == "GNSS":
                     self.autonomous_status.publish(msg)
-                if self.target_name == "mallet":
+                if self.target_name == "MALLET":
                     self.mallet_resume.publish(String(data="continue"))
-                if self.target_name == "bottle":
+                if self.target_name == "BOTTLE":
                     self.bottle_resume.publish(String(data="continue"))
                 self.autonomous_on = False
                 self.rover.publish(self.stop)
