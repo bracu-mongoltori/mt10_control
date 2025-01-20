@@ -12,8 +12,8 @@ from math import degrees
 # Constants from original code
 RECT_WIDTH = 150
 RECT_HEIGHT = 90
-LINEAR_SPEED = 50.0
-ANGULAR_SPEED = 4.5
+LINEAR_SPEED = 70.0
+ANGULAR_SPEED = 17.0
 STOP_DISTANCE = 0.4
 TRACKING_TIMEOUT = 1.5  # Tolerance time in seconds for losing object while tracking
 
