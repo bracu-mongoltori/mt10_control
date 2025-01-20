@@ -16,8 +16,7 @@ class GNSSPublisher(Node):
             String, "/autonomous_status", self.reached_callback, 10
         )
         self.gnss_points = []
-        self.load_gnss_points()
-        self.publish_next_point()
+        
 
     def load_gnss_points(self):
         with open(
@@ -27,7 +26,6 @@ class GNSSPublisher(Node):
             for line in file:
                 target, lat, lon = line.strip().split(",")
                 self.gnss_points.append((target, float(lat), float(lon)))
-            self.get_logger().info(f"{self.gnss_points}")
 
     def publish_next_point(self):
         if len(self.gnss_points) > 0:
@@ -42,7 +40,7 @@ class GNSSPublisher(Node):
             self.gnss_publisher.publish(point)
             self.target_publisher.publish(target)
             self.get_logger().info(f"Published GNSS point: {lat}, {lon}")
-            self.get_logger().info(f"Published target: {lat}, {lon}")
+            self.get_logger().info(f"Published target: {targ}")
         else:
             self.get_logger().info("All Points have been published")
 
@@ -56,7 +54,9 @@ class GNSSPublisher(Node):
 def main(args=None):
     rclpy.init(args=args)
     gnss_publisher = GNSSPublisher()
-
+    
+    gnss_publisher.load_gnss_points()
+    gnss_publisher.publish_next_point()
     rclpy.spin(gnss_publisher)
 
     gnss_publisher.destroy_node()

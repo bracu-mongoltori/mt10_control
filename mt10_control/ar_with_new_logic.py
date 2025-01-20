@@ -13,7 +13,7 @@ from math import degrees
 MARKER_SIZE = 0.15
 RECT_WIDTH = 150
 RECT_HEIGHT = 90
-LINEAR_SPEED = 50.0
+LINEAR_SPEED = 70.0
 ANGULAR_SPEED = 4.5
 STOP_DISTANCE = 0.4
 TRACKING_TIMEOUT = 1.5  # Tolerance time in seconds for losing ArUco while tracking
@@ -269,6 +269,7 @@ class ArucoSearchTrackNode(Node):
                     
                     if target_reached:
                         self.state = "WAITING"
+                        self.publish_target_reached()
             else:
                 # Handle temporary loss of tracking
                 continuing = self.handle_tracking_loss()

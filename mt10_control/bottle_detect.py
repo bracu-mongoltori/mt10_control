@@ -23,7 +23,7 @@ class YOLOSearchTrackNode(Node):
         
         # Publishers
         self.vel_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.detection_status_pub = self.create_publisher(Bool, '/mallet_detection_status', 10)
+        self.detection_status_pub = self.create_publisher(Bool, '/bottle_detection_status', 10)
         
         # Subscribers
         self.orientation = self.create_subscription(
@@ -296,7 +296,7 @@ class YOLOSearchTrackNode(Node):
         cv2.putText(display_frame, f"State: {self.state}", 
                     (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
         
-        cv2.imshow('Mallet Search and Track', display_frame)
+        cv2.imshow('Bottle Search and Track', display_frame)
         cv2.waitKey(1)
     
     def __del__(self):
