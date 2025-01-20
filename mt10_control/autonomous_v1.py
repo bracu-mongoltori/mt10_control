@@ -23,6 +23,7 @@ class Autonomous(Node):
         self.mallet_resume = self.create_publisher(String, "/continue_search", 10)
         self.bottle_resume = self.create_publisher(String, "/continue_search", 10)
         self.autonomous_status = self.create_publisher(String, "/autonomous_status", 10)
+        self.arm_disarm_pub = self.create_publisher(Bool, "/arm_disarm", 10)
         self.status_timer = self.create_timer(0.2, self.status_stuff)
         self.autonomous_timer = self.create_timer(0.2, self.autonomous_callback)
         #self.log_timer = self.create_timer(0.2, self.log_callback)
@@ -58,6 +59,7 @@ class Autonomous(Node):
         self.prev_msg = None
 
         self.get_logger().info("Node initialized. Begin.")
+        self.arm_disarm_pub.publish(True)
 
     def distance_from_gps(self, lat1, lat2, lon1, lon2):
         #radius of earth in kilometers
