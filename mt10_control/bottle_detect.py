@@ -12,9 +12,9 @@ from math import degrees
 # Constants from original code
 RECT_WIDTH = 150
 RECT_HEIGHT = 90
-LINEAR_SPEED = 70.0
-ANGULAR_SPEED = 17.5
-STOP_DISTANCE = 1.5
+LINEAR_SPEED = 50.0
+ANGULAR_SPEED = 4.5
+STOP_DISTANCE = 0.4
 TRACKING_TIMEOUT = 1.5  # Tolerance time in seconds for losing object while tracking
 
 class YOLOSearchTrackNode(Node):
@@ -42,7 +42,7 @@ class YOLOSearchTrackNode(Node):
         self.cap.set(cv2.CAP_PROP_FPS, 60)
         
         # Initialize YOLO model
-        self.model = YOLO('yolov8n.pt')
+        self.model = YOLO('/home/kage/Downloads/bottle.pt')
         
         # Create timer for camera callback
         self.timer = self.create_timer(0.0167, self.camera_callback)  # 60Hz
@@ -123,8 +123,9 @@ class YOLOSearchTrackNode(Node):
         # Run YOLO detection
             results = self.model(frame)
             
-            for result in results[0].boxes.data:
-                x1, y1, x2, y2, conf = result
+            for result in results[0].boxes:
+                x1, y1, x2, y2 = result.xyxy[0]
+                conf = result.conf[0]
                 if conf > 0.5:
                     bbox = [int(x1), int(y1), int(x2), int(y2)]
                     center_x = (bbox[0] + bbox[2]) // 2
