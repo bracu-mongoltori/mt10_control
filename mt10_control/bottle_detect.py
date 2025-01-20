@@ -14,7 +14,7 @@ RECT_WIDTH = 150
 RECT_HEIGHT = 90
 LINEAR_SPEED = 70.0
 ANGULAR_SPEED = 17.5
-STOP_DISTANCE = 1.0
+STOP_DISTANCE = 1.5
 TRACKING_TIMEOUT = 1.5  # Tolerance time in seconds for losing object while tracking
 
 class YOLOSearchTrackNode(Node):
