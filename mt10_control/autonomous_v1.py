@@ -59,7 +59,9 @@ class Autonomous(Node):
         self.prev_msg = None
 
         self.get_logger().info("Node initialized. Begin.")
-        self.arm_disarm_pub.publish(True)
+        bool_msg = Bool()
+        bool_msg.data = True
+        self.arm_disarm_pub.publish(bool_msg)
 
     def distance_from_gps(self, lat1, lat2, lon1, lon2):
         #radius of earth in kilometers

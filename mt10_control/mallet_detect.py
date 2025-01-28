@@ -12,9 +12,9 @@ from math import degrees
 # Constants from original code
 RECT_WIDTH = 150
 RECT_HEIGHT = 90
-LINEAR_SPEED = 50.0
-ANGULAR_SPEED = 4.5
-STOP_DISTANCE = 0.4
+LINEAR_SPEED = 70.0
+ANGULAR_SPEED = 16.5
+STOP_DISTANCE = 1.5
 TRACKING_TIMEOUT = 1.5  # Tolerance time in seconds for losing object while tracking
 
 class YOLOSearchTrackNode(Node):
@@ -38,11 +38,11 @@ class YOLOSearchTrackNode(Node):
         self.point_publish_cmd = self.create_publisher(String, '/point_publish_cmd', 10)
         
         # Initialize video capture
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(3)
         self.cap.set(cv2.CAP_PROP_FPS, 60)
         
         # Initialize YOLO model
-        self.model = YOLO('yolov8n.pt')
+        self.model = YOLO('/home/mt10/mt10_ws/src/mt10_control/mt10_control/best2.pt')
         
         # Create timer for camera callback
         self.timer = self.create_timer(0.0167, self.camera_callback)  # 60Hz
@@ -266,7 +266,7 @@ class YOLOSearchTrackNode(Node):
                 center = largest_object['center']
                 bbox_height = bbox[3] - bbox[1]
                 
-                distance = self.calculate_distance(bbox_height, frame.shape[0])
+                distance = self.calculate_distance(bbox_height)
                 instruction = self.get_movement_instruction(center, rect_bounds, distance)
                 
                 self.get_logger().info(f"Distance to object: {distance:.2f} m")

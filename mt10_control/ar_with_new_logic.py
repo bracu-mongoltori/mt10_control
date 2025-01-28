@@ -14,8 +14,8 @@ MARKER_SIZE = 0.15
 RECT_WIDTH = 150
 RECT_HEIGHT = 90
 LINEAR_SPEED = 70.0
-ANGULAR_SPEED = 4.5
-STOP_DISTANCE = 0.4
+ANGULAR_SPEED = 12.0
+STOP_DISTANCE = 1.0
 TRACKING_TIMEOUT = 1.5  # Tolerance time in seconds for losing ArUco while tracking
 
 class ArucoSearchTrackNode(Node):
@@ -39,7 +39,7 @@ class ArucoSearchTrackNode(Node):
         self.point_publish_cmd = self.create_publisher(String, '/point_publish_cmd', 10)
         
         # Initialize video capture
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(1)
         self.cap.set(cv2.CAP_PROP_FPS, 60)
         
         # Load ArUco dictionary and parameters
@@ -71,7 +71,7 @@ class ArucoSearchTrackNode(Node):
             self.detection_start_time = time.time()
             self.total_rotation = 0.0
             self.start_yaw = None
-            
+            90.424194095
     def publish_target_reached(self):
         msg = String()
         msg.data = 'reached'
@@ -131,6 +131,7 @@ class ArucoSearchTrackNode(Node):
         if self.start_yaw is None:
             self.start_yaw = self.my_yaw
         msg = Twist()
+        print("test")
         msg.angular.z = -ANGULAR_SPEED
         if msg!=self.prev_msg:
             self.prev_msg= msg
@@ -223,24 +224,28 @@ class ArucoSearchTrackNode(Node):
         
         elif self.state == "ROTATING":
             if self.start_yaw is not None:
-                angle_diff = ((self.my_yaw - self.start_yaw) + 360) % 360
+                angle_diff = ((self.my_yaw - self.start_yaw)) % 360
                 self.get_logger().info(f"Angle diff= {angle_diff}")
                 self.get_logger().info(f"Total rotation= {self.total_rotation}")
-                if angle_diff >= 60.0 and angle_diff< 350.0:
+                if angle_diff >= 60.0 and angle_diff<= 350.0:
                     self.total_rotation += 60.0
+                    self.start_yaw = self.my_yaw
                     if self.total_rotation >= 360.0:
                         self.get_logger().info('360 rotation done, ArUco not found. Waiting for next decision.')
                         msg = Twist()
                         self.vel_publisher.publish(msg)
                         self.state = "WAITING"
                         self.point_publish_cmd.publish(String(data="go to point"))
+                        self.prev_msg = None
                         return
                     
                     msg = Twist()
+                    self.prev_msg = msg
                     self.vel_publisher.publish(msg)
                     self.state = "DETECTING"
                     self.detection_start_time = current_time
                     self.start_yaw = None
+                
         
         elif self.state == "TRACKING":
             if ids is not None:
