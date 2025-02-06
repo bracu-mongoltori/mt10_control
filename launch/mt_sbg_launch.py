@@ -9,7 +9,7 @@ def generate_launch_description():
 	#	'config',
 	#	'mt_sbg_config.yaml'
 	#)
-	config = '/home/mt10/mt10_ws/src/mt10_control/config/mt_sbg_config.yaml'
+	config = '/home/mt/mt_ws/src/mt10_control/config/mt_sbg_config.yaml'
 
 	return LaunchDescription([
 		Node(

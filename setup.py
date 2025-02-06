@@ -28,7 +28,7 @@ setup(
             "diff_drive = mt10_control.diff_drive:main",
             "autonomous = mt10_control.autonomous_v1:main",
             "gps_pub = mt10_control.gps_pub:main",
-            "joy_node = mt10_control.joy_node:main",
+            "joy_control = mt10_control.joy_control:main",
             "joy_jesan= mt10_control.getVelocity:main",
             "aruco_tracker = mt10_control.aruco_follower:main",
             "dummy = mt10_control.dummy_sbg:main",

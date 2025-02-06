@@ -1,3 +1,4 @@
 <TargetName>,<Latitude>,<Longitude> # make sure it there is nothing else on the line and is seperated by commas. Also make sure to not create empty lines
-AR,23.774303152,90.424253945
-AR,23.774205171,90.424194095
+GNSS,23.774330129,90.424309002
+GNSS,23.774239449,90.424246474
+GNSS,23.774330129,90.424309002

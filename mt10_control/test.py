@@ -20,7 +20,7 @@ class GNSSPublisher(Node):
 
     def load_gnss_points(self):
         with open(
-            "/home/mt10/mt10_ws/src/mt10_control/mt10_control/gnss_points.txt", "r"
+            "/home/mt/mt_ws/src/mt10_control/mt10_control/gnss_points.txt", "r"
         ) as file:
             next(file)
             for line in file:

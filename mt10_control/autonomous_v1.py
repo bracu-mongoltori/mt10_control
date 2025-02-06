@@ -10,7 +10,7 @@ from math import radians, degrees, sin, cos, asin, sqrt, atan2
 
 
 class Autonomous(Node):
-    def __init__(self, max_lin_vel=80.0, max_ang_vel=17.0, yaw_threshold=10, distance_threshold=0.5):
+    def __init__(self, max_lin_vel=80.0, max_ang_vel=17.0, yaw_threshold=2, distance_threshold=0.5):
         super().__init__("autonomous")
         self.autonomous = self.create_subscription(SbgGpsPos, "/coord_pub", self.coordinates_callback, 10)
         self.autonomous = self.create_subscription(String, "/target_name", self.coordinates_name_callback, 10)
@@ -151,7 +151,7 @@ class Autonomous(Node):
                 if d_yaw > 180:
                     d_yaw = 360 - d_yaw
 
-                if d_yaw > 5:
+                if d_yaw > 2:
                     if lower_limit < -135 and self.my_yaw > 90:
                         msg = self.left
                         turn_log = "turning left hard"        
