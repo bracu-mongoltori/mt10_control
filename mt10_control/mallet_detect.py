@@ -38,7 +38,7 @@ class YOLOSearchTrackNode(Node):
         self.point_publish_cmd = self.create_publisher(String, '/point_publish_cmd', 10)
         
         # Initialize video capture
-        self.cap = cv2.VideoCapture(3)
+        self.cap = cv2.VideoCapture(1)
         self.cap.set(cv2.CAP_PROP_FPS, 60)
         
         # Initialize YOLO model
@@ -77,7 +77,7 @@ class YOLOSearchTrackNode(Node):
     
     def orientation_callback(self, msg: SbgEkfEuler):
         self.my_yaw = degrees(msg.angle.z)
-        self.my_yaw = (self.my_yaw + 360) % 360
+        self.my_yaw = (self.my_yaw) % 360
     
     def get_movement_instruction(self, object_center, rect_bounds, distance):
         if distance < STOP_DISTANCE:
@@ -158,6 +158,7 @@ class YOLOSearchTrackNode(Node):
             self.get_logger().info('Target reached! Stopping robot. Waiting for continue command...')
             
             self.vel_publisher.publish(msg)
+            self.prev_msg = None
             return True
         else:
             if instruction == "Move Forward":
@@ -173,7 +174,6 @@ class YOLOSearchTrackNode(Node):
             self.vel_publisher.publish(msg)
             self.prev_msg = msg
             
-        self.vel_publisher.publish(msg)
         return False
     
     def handle_tracking_loss(self):

@@ -13,8 +13,8 @@ from math import degrees
 MARKER_SIZE = 0.15
 RECT_WIDTH = 150
 RECT_HEIGHT = 90
-LINEAR_SPEED = 70.0
-ANGULAR_SPEED = 12.0
+LINEAR_SPEED = 30.0
+ANGULAR_SPEED = 35.0
 STOP_DISTANCE = 1.0
 TRACKING_TIMEOUT = 1.5  # Tolerance time in seconds for losing ArUco while tracking
 
@@ -71,7 +71,7 @@ class ArucoSearchTrackNode(Node):
             self.detection_start_time = time.time()
             self.total_rotation = 0.0
             self.start_yaw = None
-            90.424194095
+            
     def publish_target_reached(self):
         msg = String()
         msg.data = 'reached'
@@ -80,7 +80,7 @@ class ArucoSearchTrackNode(Node):
     
     def orientation_callback(self, msg: SbgEkfEuler):
         self.my_yaw = degrees(msg.angle.z)
-        self.my_yaw = (self.my_yaw + 360) % 360
+        self.my_yaw = (self.my_yaw) % 360
     
     # [Previous helper functions remain the same: calculate_distance, draw_guides, get_movement_instruction, ar_detection]
     
@@ -131,7 +131,7 @@ class ArucoSearchTrackNode(Node):
         if self.start_yaw is None:
             self.start_yaw = self.my_yaw
         msg = Twist()
-        print("test")
+        
         msg.angular.z = -ANGULAR_SPEED
         if msg!=self.prev_msg:
             self.prev_msg= msg
@@ -146,6 +146,10 @@ class ArucoSearchTrackNode(Node):
             self.get_logger().info('Target reached! Stopping robot. Waiting for continue command...')
             
             self.vel_publisher.publish(msg)
+            self.prev_msg = None
+            self.last_instruction = instruction
+            self.get_logger().info(f"Ins stop: {self.last_instruction}")
+
             return True
         else:
             if instruction == "Move Forward":
@@ -161,7 +165,8 @@ class ArucoSearchTrackNode(Node):
             self.vel_publisher.publish(msg)
             self.prev_msg = msg
             
-        self.vel_publisher.publish(msg)
+        # self.vel_publisher.publish(msg)
+        self.get_logger().info(f"Ins all: {self.last_instruction}")
         return False
     
     def handle_tracking_loss(self):

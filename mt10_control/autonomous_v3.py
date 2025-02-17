@@ -10,7 +10,7 @@ from math import radians, degrees, sin, cos, asin, sqrt, atan2
 
 
 class Autonomous(Node):
-    def __init__(self, max_lin_vel=30.0, max_ang_vel=35.0, yaw_threshold=15, distance_threshold=1.0):
+    def __init__(self, max_lin_vel=150.0, max_ang_vel=12.0, yaw_threshold=0, distance_threshold=1.0):
         super().__init__("autonomous")
         self.autonomous = self.create_subscription(SbgGpsPos, "/coord_pub", self.coordinates_callback, 10)
         self.autonomous = self.create_subscription(String, "/target_name", self.coordinates_name_callback, 10)
@@ -83,7 +83,7 @@ class Autonomous(Node):
     def bearing(self, curr_lat, curr_lon, target_lat, target_lon): #Bearing to waypoint (degrees)
         target_lat, target_lon, curr_lat, curr_lon = map(radians, [target_lat, target_lon, curr_lat, curr_lon])
         d_lon = target_lon - curr_lon
-        return degrees(atan2(sin(d_lon) * cos(target_lat), cos(curr_lat) * sin(target_lat) - (sin(curr_lat) * cos(target_lat) * cos(d_lon))))%360
+        return degrees(atan2(sin(d_lon) * cos(target_lat), cos(curr_lat) * sin(target_lat) - (sin(curr_lat) * cos(target_lat) * cos(d_lon))))
 
     def gps_callback(self, msg: SbgGpsPos):
     #def gps_callback(self, msg: SbgEkfNav):
@@ -91,7 +91,7 @@ class Autonomous(Node):
         self.my_lon = msg.longitude
 
     def orientation_callback(self, msg: SbgEkfEuler):
-        self.my_yaw = degrees(msg.angle.z)%360
+        self.my_yaw = degrees(msg.angle.z)
         # print(self.my_yaw)
 
     def status_stuff(self, msg=None):
@@ -144,23 +144,26 @@ class Autonomous(Node):
                 # distance = haversine_distance(lat, lon, target_lat, target_lon)
                 target_yaw = self.bearing(self.my_lat, self.my_lon, self.target_lat, self.target_lon)
 
-                # upper_limit = target_yaw + self.yaw_threshold
-                # lower_limit = target_yaw - self.yaw_threshold
+                upper_limit = target_yaw + self.yaw_threshold
+                lower_limit = target_yaw - self.yaw_threshold
 
                 d_yaw = abs(target_yaw - self.my_yaw)
                 self.get_logger().info(f"yaw: {d_yaw}")
 
-                if d_yaw >= 10:
+                if d_yaw > 180:
+                    d_yaw = 360 - d_yaw
+
+                if d_yaw >= 3:
                     #if lower_limit < -135 and self.my_yaw > 90:
                      #   msg = self.left
                       #  turn_log = "turning left hard"        
                     #elif upper_limit > 135 and self.my_yaw < -90:
                      #   msg = self.right
                       #  turn_log = "turning right hard"
-                    if self.my_yaw > target_yaw:
+                    if self.my_yaw > upper_limit:
                         msg = self.left
                         turn_log = "turning left"
-                    elif self.my_yaw < target_yaw:
+                    elif self.my_yaw < lower_limit:
                         msg = self.right
                         turn_log = "turning right"
                     else:
@@ -178,7 +181,7 @@ class Autonomous(Node):
                     self.status_stuff(f"target lat: {self.target_lat}, target lon: {self.target_lon}")
                     self.status_stuff(f"Current distance to target: {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
                     self.status_stuff(f"Current yaw: {self.my_yaw}, target yaw: {target_yaw}")
-                    self.status_stuff(f"Angle left: {abs(d_yaw)}")
+                    self.status_stuff(f"Angle left: {abs(target_yaw - self.my_yaw)}")
                     self.status_stuff("")
                     self.status_stuff(f"{turn_log}")
                     pass

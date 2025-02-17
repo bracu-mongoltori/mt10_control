@@ -14,7 +14,7 @@ RECT_WIDTH = 150
 RECT_HEIGHT = 90
 LINEAR_SPEED = 70.0
 ANGULAR_SPEED = 16.5
-STOP_DISTANCE = 1.5
+STOP_DISTANCE = 1.0
 TRACKING_TIMEOUT = 1.5  # Tolerance time in seconds for losing object while tracking
 
 class YOLOSearchTrackNode(Node):
@@ -77,7 +77,7 @@ class YOLOSearchTrackNode(Node):
     
     def orientation_callback(self, msg: SbgEkfEuler):
         self.my_yaw = degrees(msg.angle.z)
-        self.my_yaw = (self.my_yaw + 360) % 360
+        self.my_yaw = (self.my_yaw) % 360
     
     def get_movement_instruction(self, object_center, rect_bounds, distance):
         if distance < STOP_DISTANCE:
@@ -158,6 +158,7 @@ class YOLOSearchTrackNode(Node):
             self.get_logger().info('Target reached! Stopping robot. Waiting for continue command...')
             
             self.vel_publisher.publish(msg)
+            self.prev_msg = None
             return True
         else:
             if instruction == "Move Forward":
