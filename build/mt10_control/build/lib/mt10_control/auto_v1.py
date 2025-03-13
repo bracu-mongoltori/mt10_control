@@ -1,0 +1,194 @@
+import rclpy
+from rclpy.node import Node 
+from std_msgs.msg import String, Bool
+from geometry_msgs.msg import Twist
+from sbg_driver.msg import SbgEkfEuler
+from sbg_driver.msg import SbgGpsPos
+from sbg_driver.msg import SbgEkfNav
+from time import sleep
+from math import radians, degrees, sin, cos, asin, sqrt, atan2
+
+
+class Autonomous(Node):
+    def __init__(self, max_lin_vel=69.0, max_ang_vel=7.0, yaw_threshold=10, distance_threshold=0.5):
+        super().__init__("autonomous")
+        self.autonomous = self.create_subscription(SbgGpsPos, "/coordinates", self.coordinates_callback, 10)
+        self.rover = self.create_publisher(Twist, "/cmd_vel", 10)
+        self.gps = self.create_subscription(SbgGpsPos, "/sbg/gps_pos", self.gps_callback, 10)
+        # self.gps = self.create_subscription(SbgEkfNav, "/sbg/ekf_nav", self.gps_callback, 10)
+        self.orientation = self.create_subscription(SbgEkfEuler, "/sbg/ekf_euler", self.orientation_callback, 10)
+        self.status_pub = self.create_publisher(String, "/status", 10)
+        self.autonomous_status = self.create_publisher(Bool, "/autonomous_status", 10)
+        self.status_timer = self.create_timer(0.2, self.status_stuff)
+        self.autonomous_timer = self.create_timer(0.2, self.autonomous_callback)
+        #self.log_timer = self.create_timer(0.2, self.log_callback)
+        self.point_status = self.create_publisher(String, "/point_status", 10)
+
+
+        self.autonomous_on = False
+
+        self.my_lat = 0.0
+        self.my_lon = 0.0
+        self.my_yaw = 0.0
+
+        self.target_lat = 0.0
+        self.target_lon = 0.0
+
+        self.yaw_threshold = yaw_threshold
+        self.distance_threshold = distance_threshold
+
+        self.forward = Twist()
+        self.left = Twist()
+        self.right = Twist()
+        self.backward = Twist()
+        self.stop = Twist()
+
+        self.forward.linear.x = max_lin_vel
+        self.left.angular.z = max_ang_vel
+        self.right.angular.z = -max_ang_vel
+        self.backward.linear.x = -max_lin_vel
+        self.stop.linear.x = 0.0
+        self.stop.linear.z = 0.0
+
+        self.prev_msg = None
+
+        self.get_logger().info("Node initialized. Begin.")
+
+    def distance_from_gps(self, lat1, lat2, lon1, lon2):
+        #radius of earth in kilometers
+        r = 6371
+
+        lon1 = radians(lon1)
+        lon2 = radians(lon2)
+        lat1 = radians(lat1)
+        lat2 = radians(lat2)
+        
+        #Haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+        c = 2 * asin(sqrt(a))
+
+        return c * r * 1000
+
+    def bearing(self, curr_lat, curr_lon, target_lat, target_lon): #Bearing to waypoint (degrees)
+        target_lat, target_lon, curr_lat, curr_lon = map(radians, [target_lat, target_lon, curr_lat, curr_lon])
+        d_lon = target_lon - curr_lon
+        return degrees(atan2(sin(d_lon) * cos(target_lat), cos(curr_lat) * sin(target_lat) - (sin(curr_lat) * cos(target_lat) * cos(d_lon))))
+
+    def gps_callback(self, msg: SbgGpsPos):
+    #def gps_callback(self, msg: SbgEkfNav):
+        self.my_lat = msg.latitude
+        self.my_lon = msg.longitude
+
+    def orientation_callback(self, msg: SbgEkfEuler):
+        self.my_yaw = degrees(msg.angle.z)
+        # print(self.my_yaw)
+
+    def status_stuff(self, msg=None):
+        pubbed = String()
+        bool_pub = Bool()
+        if self.autonomous_on == False:
+            bool_msg = False
+            msg = "Rover autonomous navigation not active"
+        else:
+            bool_msg = True
+        pubbed.data = str(msg)
+        bool_pub.data = bool_msg
+        self.status_pub.publish(pubbed)
+        if msg != None:
+            self.get_logger().info(msg)
+        self.autonomous_status.publish(bool_pub)
+    
+    def coordinates_callback(self, msg: SbgGpsPos):
+    # def coordinates_callback(self, msg: SbgEkfNav):
+        self.autonomous_on = True
+        self.target_lat = msg.latitude
+        self.target_lon = msg.longitude
+        self.get_logger().info("Beginning Navigation")
+        self.get_logger().info(f"Current distance to target {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
+        
+
+    def autonomous_callback(self):
+        if self.autonomous_on == False:
+            pass
+        else:
+            if self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon) < self.distance_threshold:
+                msg = String()
+                msg.data = "Reached"
+                print("Reached position")
+                self.point_status.publish(msg)
+                self.autonomous_on = False
+                self.rover.publish(self.stop)
+            else:
+               #  self.rover.publish(self.stop) # Needed for Real Rover
+
+                # distance = haversine_distance(lat, lon, target_lat, target_lon)
+                target_yaw = self.bearing(self.my_lat, self.my_lon, self.target_lat, self.target_lon)
+
+                upper_limit = target_yaw + self.yaw_threshold
+                lower_limit = target_yaw - self.yaw_threshold
+
+                d_yaw = abs(target_yaw - self.my_yaw)
+
+                if d_yaw > 180:
+                    d_yaw = 360 - d_yaw
+
+                if d_yaw > 5:
+                    if lower_limit < -135 and self.my_yaw > 90:
+                        msg = self.left
+                        turn_log = "turning left hard"        
+                    elif upper_limit > 135 and self.my_yaw < -90:
+                        msg = self.right
+                        turn_log = "turning right hard"
+                    elif self.my_yaw > upper_limit:
+                        msg = self.left
+                        turn_log = "turning left"
+                    elif self.my_yaw < lower_limit:
+                        msg = self.right
+                        turn_log = "turning right"
+                    else:
+                        msg = self.forward
+                        turn_log = "forward"
+
+                else:
+                    msg = self.forward
+                    turn_log = "forward"
+
+                if msg == self.prev_msg:
+                    self.status_stuff("GPS: ")
+                    self.status_stuff(f"lat: {self.my_lat}, lon: {self.my_lon}")
+                    self.status_stuff(f"target lat: {self.target_lat}, target lon: {self.target_lon}")
+                    self.status_stuff(f"Current distance to target: {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
+                    self.status_stuff(f"Current yaw: {self.my_yaw}, target yaw: {target_yaw}")
+                    self.status_stuff(f"Angle left: {abs(target_yaw - self.my_yaw)}")
+                    self.status_stuff("")
+                    self.status_stuff(f"{turn_log}")
+                    pass
+                else:
+                    self.rover.publish(msg)
+                    self.prev_msg = msg
+                    self.status_stuff("GPS: ")
+                    self.status_stuff(f"lat: {self.my_lat}, lon: {self.my_lon}")
+                    self.status_stuff(f"target lat: {self.target_lat}, target lon: {self.target_lon}")
+                    self.status_stuff(f"Current distance to target: {self.distance_from_gps(self.my_lat, self.target_lat, self.my_lon, self.target_lon)}")
+                    self.status_stuff(f"Current yaw: {self.my_yaw}, target yaw: {target_yaw}")
+                    self.status_stuff(f"Angle left: {abs(target_yaw - self.my_yaw)}")
+                    self.status_stuff("")
+                    self.status_stuff(f"{turn_log}")
+                        
+                # sleep(0.2)
+
+def main():
+    rclpy.init()
+    autonomous = Autonomous()
+
+    rclpy.spin(autonomous)
+
+    autonomous.destroy_node()
+    rclpy.shutdowm()
+
+if __name__ == "__main__":
+    main()
+
+        
