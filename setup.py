@@ -37,6 +37,7 @@ setup(
             "mallet = mt10_control.mallet_detect:main",
             "bottle = mt10_control.mallet_detect:main",
             "point_follower = mt10_control.point_follow:main",
+            "imu_phone = mt10_control.imu_phone_data:main",
         ],
     },
 )

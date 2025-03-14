@@ -1,0 +1,15 @@
+[console_scripts]
+aruco_new = mt10_control.ar_with_new_logic:main
+aruco_tracker = mt10_control.aruco_follower:main
+autonomous = mt10_control.autonomous_v1:main
+bottle = mt10_control.mallet_detect:main
+diff_drive = mt10_control.diff_drive:main
+dummy = mt10_control.dummy_sbg:main
+gps_pub = mt10_control.gps_pub:main
+gps_txt = mt10_control.test:main
+imu_phone = mt10_control.imu_phone_data:main
+joy_jesan = mt10_control.getVelocity:main
+joy_node = mt10_control.joy_node:main
+mallet = mt10_control.mallet_detect:main
+point_follower = mt10_control.point_follow:main
+
