@@ -267,6 +267,7 @@ class YOLOSearchTrackNode(Node):
             self.log_info('Target reached! Stopping robot. Waiting for continue command...')
             
             self.vel_publisher.publish(msg)
+            self.prev_msg = None
             return True
         else:
             if instruction == "Move Forward":

@@ -90,6 +90,7 @@ class Autonomous(Node):
         target_lat, target_lon, curr_lat, curr_lon = map(radians, [target_lat, target_lon, curr_lat, curr_lon])
         d_lon = target_lon - curr_lon
         return degrees(atan2(sin(d_lon) * cos(target_lat), cos(curr_lat) * sin(target_lat) - (sin(curr_lat) * cos(target_lat) * cos(d_lon))))%360
+        return degrees(atan2(sin(d_lon) * cos(target_lat), cos(curr_lat) * sin(target_lat) - (sin(curr_lat) * cos(target_lat) * cos(d_lon))))%360
 
     def gps_callback(self, msg: SbgGpsPos):
     #def gps_callback(self, msg: SbgEkfNav):
@@ -165,6 +166,7 @@ class Autonomous(Node):
                 if self.target_name == "BOTTLE":
                     self.bottle_resume.publish(String(data="continue"))
                 self.autonomous_on = False
+                self.prev_msg = None
                 self.rover.publish(self.stop)
             else:
                #  self.rover.publish(self.stop) # Needed for Real Rover

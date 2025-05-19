@@ -1,0 +1,121 @@
+running egg_info
+creating build/mt10_control/mt10_control.egg-info
+writing build/mt10_control/mt10_control.egg-info/PKG-INFO
+writing dependency_links to build/mt10_control/mt10_control.egg-info/dependency_links.txt
+writing entry points to build/mt10_control/mt10_control.egg-info/entry_points.txt
+writing requirements to build/mt10_control/mt10_control.egg-info/requires.txt
+writing top-level names to build/mt10_control/mt10_control.egg-info/top_level.txt
+writing manifest file 'build/mt10_control/mt10_control.egg-info/SOURCES.txt'
+reading manifest file 'build/mt10_control/mt10_control.egg-info/SOURCES.txt'
+adding license file 'LICENSE'
+writing manifest file 'build/mt10_control/mt10_control.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /media/entropy/Development/mt10_control/build/mt10_control/build
+creating /media/entropy/Development/mt10_control/build/mt10_control/build/lib
+creating /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/arcuo_tracker.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/aruco_follower.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/aruco_follower_with_search.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/aruco_tracker.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/ar_fixed.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/ar_with_new_logic.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/autonomous_v1.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/autonomous_v2.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/autonomous_v3.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/auto_v1.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/bottle_detect.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/diff_drive.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/dummy_sbg.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/gps_pub.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/imu_phone_data.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/joy_node.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/joy_node_jesan.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/mallet_detect.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/point_follow.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/prev_auto.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/serial_control.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/smth.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/test.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/test_heading.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+copying mt10_control/__init__.py -> /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control
+running install
+running install_lib
+creating /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/arcuo_tracker.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/aruco_follower.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/aruco_follower_with_search.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/aruco_tracker.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/ar_fixed.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/ar_with_new_logic.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/autonomous_v1.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/autonomous_v2.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/autonomous_v3.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/auto_v1.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/bottle_detect.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/diff_drive.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/dummy_sbg.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/gps_pub.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/imu_phone_data.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/joy_node.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/joy_node_jesan.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/mallet_detect.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/point_follow.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/prev_auto.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/serial_control.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/smth.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/test.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/test_heading.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+copying /media/entropy/Development/mt10_control/build/mt10_control/build/lib/mt10_control/__init__.py -> /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/arcuo_tracker.py to arcuo_tracker.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/aruco_follower.py to aruco_follower.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/aruco_follower_with_search.py to aruco_follower_with_search.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/aruco_tracker.py to aruco_tracker.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/ar_fixed.py to ar_fixed.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/ar_with_new_logic.py to ar_with_new_logic.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/autonomous_v1.py to autonomous_v1.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/autonomous_v2.py to autonomous_v2.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/autonomous_v3.py to autonomous_v3.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/auto_v1.py to auto_v1.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/bottle_detect.py to bottle_detect.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/diff_drive.py to diff_drive.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/dummy_sbg.py to dummy_sbg.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/gps_pub.py to gps_pub.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/imu_phone_data.py to imu_phone_data.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/joy_node.py to joy_node.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/joy_node_jesan.py to joy_node_jesan.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/mallet_detect.py to mallet_detect.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/point_follow.py to point_follow.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/prev_auto.py to prev_auto.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/serial_control.py to serial_control.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/smth.py to smth.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/test.py to test.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/test_heading.py to test_heading.cpython-310.pyc
+byte-compiling /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control/__init__.py to __init__.cpython-310.pyc
+running install_data
+creating /media/entropy/Development/mt10_control/install/mt10_control/share/ament_index
+creating /media/entropy/Development/mt10_control/install/mt10_control/share/ament_index/resource_index
+creating /media/entropy/Development/mt10_control/install/mt10_control/share/ament_index/resource_index/packages
+copying resource/mt10_control -> /media/entropy/Development/mt10_control/install/mt10_control/share/ament_index/resource_index/packages
+copying package.xml -> /media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control
+creating /media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/launch
+copying launch/autonomous_launch.py -> /media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/launch
+copying launch/mt_diffdrive_launch.py -> /media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/launch
+copying launch/mt_sbg_launch.py -> /media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/launch
+running install_egg_info
+Copying build/mt10_control/mt10_control.egg-info to /media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages/mt10_control-0.0.0-py3.10.egg-info
+running install_scripts
+Installing aruco_new script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing aruco_tracker script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing autonomous script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing bottle script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing diff_drive script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing dummy script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing gps_pub script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing gps_txt script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing imu_phone script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing joy_jesan script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing joy_node script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing mallet script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+Installing point_follower script to /media/entropy/Development/mt10_control/install/mt10_control/lib/mt10_control
+writing list of installed files to '/media/entropy/Development/mt10_control/build/mt10_control/install.log'

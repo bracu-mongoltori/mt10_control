@@ -225,6 +225,7 @@ class ArucoSearchTrackNode(Node):
             self.start_yaw = self.my_yaw
         msg = Twist()
         
+        
         msg.angular.z = -ANGULAR_SPEED
         self.vel_publisher.publish(msg)
                 

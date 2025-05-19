@@ -1,0 +1,89 @@
+[0.106s] DEBUG:colcon:Command line arguments: ['/home/entropy/.local/bin/colcon', 'build']
+[0.106s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=16, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x79622624c070>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7962263c5720>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7962263c5720>>)
+[0.199s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.199s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.199s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.199s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.199s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.199s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.199s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/media/entropy/Development/mt10_control'
+[0.199s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.199s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.199s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.199s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.199s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.200s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.200s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.200s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.200s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.208s] DEBUG:colcon.colcon_core.package_identification:Package '.' with type 'ros.ament_python' and name 'mt10_control'
+[0.208s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.208s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.208s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.208s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.208s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.224s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.224s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.226s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 389 installed packages in /opt/ros/humble
+[0.233s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[0.259s] Level 5:colcon.colcon_core.verb:set package 'mt10_control' build argument 'cmake_args' from command line to 'None'
+[0.259s] Level 5:colcon.colcon_core.verb:set package 'mt10_control' build argument 'cmake_target' from command line to 'None'
+[0.259s] Level 5:colcon.colcon_core.verb:set package 'mt10_control' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.259s] Level 5:colcon.colcon_core.verb:set package 'mt10_control' build argument 'cmake_clean_cache' from command line to 'False'
+[0.259s] Level 5:colcon.colcon_core.verb:set package 'mt10_control' build argument 'cmake_clean_first' from command line to 'False'
+[0.259s] Level 5:colcon.colcon_core.verb:set package 'mt10_control' build argument 'cmake_force_configure' from command line to 'False'
+[0.259s] Level 5:colcon.colcon_core.verb:set package 'mt10_control' build argument 'ament_cmake_args' from command line to 'None'
+[0.259s] Level 5:colcon.colcon_core.verb:set package 'mt10_control' build argument 'catkin_cmake_args' from command line to 'None'
+[0.259s] Level 5:colcon.colcon_core.verb:set package 'mt10_control' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.259s] DEBUG:colcon.colcon_core.verb:Building package 'mt10_control' with the following arguments: {'ament_cmake_args': None, 'build_base': '/media/entropy/Development/mt10_control/build/mt10_control', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/media/entropy/Development/mt10_control/install/mt10_control', 'merge_install': False, 'path': '/media/entropy/Development/mt10_control', 'symlink_install': False, 'test_result_base': None}
+[0.259s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.260s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.260s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/media/entropy/Development/mt10_control' with build type 'ament_python'
+[0.260s] Level 1:colcon.colcon_core.shell:create_environment_hook('mt10_control', 'ament_prefix_path')
+[0.262s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.262s] INFO:colcon.colcon_core.shell:Creating environment hook '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/hook/ament_prefix_path.ps1'
+[0.263s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/hook/ament_prefix_path.dsv'
+[0.263s] INFO:colcon.colcon_core.shell:Creating environment hook '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/hook/ament_prefix_path.sh'
+[0.264s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.264s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.436s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/media/entropy/Development/mt10_control'
+[0.436s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.436s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.721s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/media/entropy/Development/mt10_control': PYTHONPATH=/media/entropy/Development/mt10_control/build/mt10_control/prefix_override:/home/entropy/.local/lib/python3.10/site-packages/colcon_core/task/python/colcon_distutils_commands:/media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/mt10_control build --build-base /media/entropy/Development/mt10_control/build/mt10_control/build install --record /media/entropy/Development/mt10_control/build/mt10_control/install.log --single-version-externally-managed install_data
+[1.032s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/media/entropy/Development/mt10_control' returned '0': PYTHONPATH=/media/entropy/Development/mt10_control/build/mt10_control/prefix_override:/home/entropy/.local/lib/python3.10/site-packages/colcon_core/task/python/colcon_distutils_commands:/media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/mt10_control build --build-base /media/entropy/Development/mt10_control/build/mt10_control/build install --record /media/entropy/Development/mt10_control/build/mt10_control/install.log --single-version-externally-managed install_data
+[1.034s] Level 1:colcon.colcon_core.environment:checking '/media/entropy/Development/mt10_control/install/mt10_control' for CMake module files
+[1.036s] Level 1:colcon.colcon_core.environment:checking '/media/entropy/Development/mt10_control/install/mt10_control' for CMake config files
+[1.038s] Level 1:colcon.colcon_core.environment:checking '/media/entropy/Development/mt10_control/install/mt10_control/lib'
+[1.038s] Level 1:colcon.colcon_core.environment:checking '/media/entropy/Development/mt10_control/install/mt10_control/bin'
+[1.038s] Level 1:colcon.colcon_core.environment:checking '/media/entropy/Development/mt10_control/install/mt10_control/lib/pkgconfig/mt10_control.pc'
+[1.039s] Level 1:colcon.colcon_core.environment:checking '/media/entropy/Development/mt10_control/install/mt10_control/lib/python3.10/site-packages'
+[1.039s] Level 1:colcon.colcon_core.shell:create_environment_hook('mt10_control', 'pythonpath')
+[1.039s] INFO:colcon.colcon_core.shell:Creating environment hook '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/hook/pythonpath.ps1'
+[1.039s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/hook/pythonpath.dsv'
+[1.040s] INFO:colcon.colcon_core.shell:Creating environment hook '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/hook/pythonpath.sh'
+[1.040s] Level 1:colcon.colcon_core.environment:checking '/media/entropy/Development/mt10_control/install/mt10_control/bin'
+[1.040s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mt10_control)
+[1.041s] INFO:colcon.colcon_core.shell:Creating package script '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/package.ps1'
+[1.041s] INFO:colcon.colcon_core.shell:Creating package descriptor '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/package.dsv'
+[1.042s] INFO:colcon.colcon_core.shell:Creating package script '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/package.sh'
+[1.043s] INFO:colcon.colcon_core.shell:Creating package script '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/package.bash'
+[1.044s] INFO:colcon.colcon_core.shell:Creating package script '/media/entropy/Development/mt10_control/install/mt10_control/share/mt10_control/package.zsh'
+[1.045s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/media/entropy/Development/mt10_control/install/mt10_control/share/colcon-core/packages/mt10_control)
+[1.045s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[1.045s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[1.045s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[1.045s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[1.051s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[1.051s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[1.051s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[1.096s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[1.097s] INFO:colcon.colcon_core.shell:Creating prefix script '/media/entropy/Development/mt10_control/install/local_setup.ps1'
+[1.098s] INFO:colcon.colcon_core.shell:Creating prefix util module '/media/entropy/Development/mt10_control/install/_local_setup_util_ps1.py'
+[1.099s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/media/entropy/Development/mt10_control/install/setup.ps1'
+[1.100s] INFO:colcon.colcon_core.shell:Creating prefix script '/media/entropy/Development/mt10_control/install/local_setup.sh'
+[1.100s] INFO:colcon.colcon_core.shell:Creating prefix util module '/media/entropy/Development/mt10_control/install/_local_setup_util_sh.py'
+[1.101s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/media/entropy/Development/mt10_control/install/setup.sh'
+[1.101s] INFO:colcon.colcon_core.shell:Creating prefix script '/media/entropy/Development/mt10_control/install/local_setup.bash'
+[1.102s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/media/entropy/Development/mt10_control/install/setup.bash'
+[1.103s] INFO:colcon.colcon_core.shell:Creating prefix script '/media/entropy/Development/mt10_control/install/local_setup.zsh'
+[1.103s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/media/entropy/Development/mt10_control/install/setup.zsh'

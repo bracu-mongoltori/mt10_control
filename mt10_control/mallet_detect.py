@@ -251,6 +251,7 @@ class YOLOSearchTrackNode(Node):
             self.light_status_pub.publish(String(data="green"))
 
             self.vel_publisher.publish(msg)
+            self.prev_msg = None
             return True
         else:
             if instruction == "Move Forward":

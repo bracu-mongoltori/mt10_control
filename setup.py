@@ -34,6 +34,7 @@ setup(
             "mallet = mt10_control.mallet_detect:main",
             "bottle = mt10_control.bottle_detect:main",
             "point_follower = mt10_control.point_follow:main",
+<<<<<<< HEAD
             # "zed_multi = mt10_control.zed_multicamera:main",
             # "zed = mt10_control.zed_camera:main",
             # "overlap = mt10_control.overlap:main",
@@ -43,6 +44,9 @@ setup(
             "auto_witmotion= mt10_control.autonomous_witmotion:main",
             "telemetry_write = mt10_control.p900_write:main",
             "best_gps = mt10_control.gps_accuracy_fix:main",
+=======
+            "imu_phone = mt10_control.imu_phone_data:main",
+>>>>>>> a131da97ca33b817510c161b986a8810b6a574a6
         ],
     },
 )
