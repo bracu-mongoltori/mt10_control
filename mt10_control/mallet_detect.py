@@ -3,49 +3,133 @@ import numpy as np
 from ultralytics import YOLO
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Bool, String
+from std_msgs.msg import Bool, String, Float64
 from geometry_msgs.msg import Twist
-from sbg_driver.msg import SbgEkfEuler
+# from sbg_driver.msg import SbgEkfEuler
 import time
 from math import degrees
+
+#libraries for socket output
+import asyncio
+import websockets
+import threading
+import base64
 
 # Constants from original code
 RECT_WIDTH = 150
 RECT_HEIGHT = 90
-LINEAR_SPEED = 70.0
-ANGULAR_SPEED = 16.5
+LINEAR_SPEED = 90.0
+ANGULAR_SPEED = 60.0
 STOP_DISTANCE = 1.5
 TRACKING_TIMEOUT = 1.5  # Tolerance time in seconds for losing object while tracking
+WEBSOCKET_PORT = 8010
+
+#WebSocket server for video streaming
+# This server will broadcast the video stream to all connected clients
+# It uses asyncio and websockets to handle multiple clients
+# The server will send the video frames as base64 encoded JPEG images
+class VideoStreamServer:
+    def __init__(self):
+        self.clients = set()
+        self.current_frame = None
+        self.frame_lock = threading.Lock()
+        self.disconnected_clients = set()
+
+    async def handler(self, websocket):
+        """Handle new WebSocket connection."""
+        self.clients.add(websocket)
+        try:
+            # Keep connection alive
+            while True:
+                await websocket.recv()
+        except websockets.exceptions.ConnectionClosed:
+            pass
+        finally:
+            self.clients.remove(websocket)
+
+    async def broadcast_frames(self):
+        """Broadcast frames to all connected clients."""
+        while True:
+            with self.frame_lock:
+                if self.current_frame is not None:
+                    _, buffer = cv2.imencode('.jpg', self.current_frame, [cv2.IMWRITE_JPEG_QUALITY, 70])
+                    jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+                    
+                    
+                    for client in self.clients:
+                        try:
+                            try:
+                                await asyncio.wait_for(client.send(jpg_as_text), timeout=0.5)
+                            except asyncio.TimeoutError:
+                                print("Client send timeout")
+                                self.disconnected_clients.add(client)
+                                break
+                        except:
+                           print("Client disconnected")
+                           self.disconnected_clients.add(client)
+                           break
+                    # Remove disconnected clients
+                    for client in self.disconnected_clients:
+                        self.clients.remove(client)
+                    self.disconnected_clients.clear()
+                    
+                    
+            await asyncio.sleep(0.03) # ~30 FPS
+
+    def update_frame(self, frame):
+        """Update the current frame to be sent to clients."""
+        with self.frame_lock:
+            self.current_frame = frame
+
+    async def start_server(self):
+        """Start the WebSocket server."""
+        async with websockets.serve(self.handler, "0.0.0.0", WEBSOCKET_PORT):
+            await self.broadcast_frames()
+
 
 class YOLOSearchTrackNode(Node):
     def __init__(self):
         super().__init__('yolo_search_track_node')
         
         # Publishers
-        self.vel_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.detection_status_pub = self.create_publisher(Bool, '/mallet_detection_status', 10)
+        self.vel_publisher = self.create_publisher(Twist, '/cmd_vel', 1)
+        self.detection_status_pub = self.create_publisher(String, '/mallet_detection_status', 10)
         
         # Subscribers
-        self.orientation = self.create_subscription(
-            SbgEkfEuler, "/sbg/ekf_euler", self.orientation_callback, 10
-        )
+
+        self.orientation = self.create_subscription(Float64, "/witmotion_eular/yaw", self.orientation_callback, 10)
+
         self.continue_sub = self.create_subscription(
             String, "/continue_search", self.continue_callback, 10
         )
         
         self.target_reached_pub = self.create_publisher(String, '/autonomous_status', 10)
         
-        self.point_publish_cmd = self.create_publisher(String, '/point_publish_cmd', 10)
+        # self.point_publish_cmd = self.create_publisher(String, '/point_publish_cmd', 10)
+
+        self.light_status_pub = self.create_publisher(String, '/light_status', 10)
+
         
         # Initialize video capture
-        self.cap = cv2.VideoCapture(3)
-        self.cap.set(cv2.CAP_PROP_FPS, 60)
+        self.cap = cv2.VideoCapture("/dev/v4l/by-id/usb-046d_Logitech_Webcam_C930e-video-index0")
+        self.cap.set(cv2.CAP_PROP_FPS, 30)
+
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
         
         # Initialize YOLO model
-        self.model = YOLO('/home/mt10/mt10_ws/src/mt10_control/mt10_control/best2.pt')
+        self.model = YOLO('/home/mt10/mt10_ws/src/mt10_control/mt10_control/mallet.pt')
         
         # Create timer for camera callback
         self.timer = self.create_timer(0.0167, self.camera_callback)  # 60Hz
+
+        # Initialize WebSocket server
+        self.video_server = VideoStreamServer()
+        self.websocket_thread = threading.Thread(
+            target=self.run_websocket_server,
+            daemon=True
+        )
+        self.websocket_thread.start()
         
         # State variables
         self.state = "WAITING"
@@ -55,29 +139,36 @@ class YOLOSearchTrackNode(Node):
         self.current_angle = 0.0
         self.target_angle = 60.0
         self.total_rotation = 0.0
-        self.prev_msg = None
         self.my_yaw = 0.0
         self.start_yaw = None
         
-        self.get_logger().info('YOLO Search and Track Node initialized')
+        self.log_info('YOLO Search and Track Node initialized')
     
     def continue_callback(self, msg: String):
         if self.state == "WAITING" and msg.data == "continue":
-            self.get_logger().info('Received continue command, resuming search')
+            self.log_info('Received continue command, resuming search')
+            msg.data= 'red'
+            self.light_status_pub.publish(msg)
             self.state = "DETECTING"
             self.detection_start_time = time.time()
             self.total_rotation = 0.0
             self.start_yaw = None
+
+    def log_info(self, msg_text: str):
+        self.get_logger().info(msg_text)
+        status_msg = String()
+        status_msg.data = msg_text
+        self.detection_status_pub.publish(status_msg)
     
     def publish_target_reached(self):
         msg = String()
         msg.data = 'reached'
         self.target_reached_pub.publish(msg)
-        self.get_logger().info('Published target reached message')
+        self.log_info('Published target reached message')
+        time.sleep(3.0)
     
-    def orientation_callback(self, msg: SbgEkfEuler):
-        self.my_yaw = degrees(msg.angle.z)
-        self.my_yaw = (self.my_yaw + 360) % 360
+    def orientation_callback(self, msg: Float64):
+        self.my_yaw = msg.data
     
     def get_movement_instruction(self, object_center, rect_bounds, distance):
         if distance < STOP_DISTANCE:
@@ -94,8 +185,8 @@ class YOLOSearchTrackNode(Node):
     
     def calculate_distance(self, bbox_height):
         # Estimate distance based on bounding box height
-        reference_height = 0.30  # Average height of a person in meters
-        focal_length_pixels = 775  # Same as original
+        reference_height = 0.10  # Average height of a mallet in meters
+        focal_length_pixels = 941  # Same as original
         distance = (reference_height * focal_length_pixels) / bbox_height
         return distance
     
@@ -145,9 +236,8 @@ class YOLOSearchTrackNode(Node):
             self.start_yaw = self.my_yaw
         msg = Twist()
         msg.angular.z = -ANGULAR_SPEED
-        if msg!=self.prev_msg:
-            self.prev_msg= msg
-            self.vel_publisher.publish(msg)
+
+        self.vel_publisher.publish(msg)
     
     def publish_movement_command(self, instruction):
         msg = Twist()
@@ -155,8 +245,11 @@ class YOLOSearchTrackNode(Node):
         if instruction == "Stop":
             msg.linear.x = 0.0
             msg.angular.z = 0.0
-            self.get_logger().info('Target reached! Stopping robot. Waiting for continue command...')
-            
+
+            self.log_info('Target reached! Stopping robot. Waiting for continue command...')
+
+            self.light_status_pub.publish(String(data="green"))
+
             self.vel_publisher.publish(msg)
             return True
         else:
@@ -169,11 +262,9 @@ class YOLOSearchTrackNode(Node):
         
         self.last_instruction = instruction
         
-        if msg != self.prev_msg:
-            self.vel_publisher.publish(msg)
-            self.prev_msg = msg
-            
+
         self.vel_publisher.publish(msg)
+            
         return False
     
     def handle_tracking_loss(self):
@@ -186,20 +277,19 @@ class YOLOSearchTrackNode(Node):
         if time_since_last_track < TRACKING_TIMEOUT:
             msg = Twist()
             if self.last_instruction == "Move Forward":
-                self.get_logger().info('Object temporarily lost, continuing forward motion')
+                self.log_info('Object temporarily lost, continuing forward motion')
                 msg.linear.x = LINEAR_SPEED
             elif self.last_instruction == "Move Left":
-                self.get_logger().info('Object temporarily lost, continuing left turn')
+                self.log_info('Object temporarily lost, continuing left turn')
                 msg.angular.z = ANGULAR_SPEED
             elif self.last_instruction == "Move Right":
-                self.get_logger().info('Object temporarily lost, continuing right turn')
+                self.log_info('Object temporarily lost, continuing right turn')
                 msg.angular.z = -ANGULAR_SPEED
-            if msg!= self.prev_msg:
-                self.prev_msg = msg
-                self.vel_publisher.publish(msg)
+
+            self.vel_publisher.publish(msg)
             return True
         else:
-            self.get_logger().info('Object lost for too long, switching to detection')
+            self.log_info('Object lost for too long, switching to detection')
             msg = Twist()
             self.vel_publisher.publish(msg)
             self.state = "DETECTING"
@@ -207,6 +297,12 @@ class YOLOSearchTrackNode(Node):
             self.last_tracking_time = None
             self.last_instruction = None
             return False
+
+    def run_websocket_server(self):
+        """Run the WebSocket server in a separate thread."""
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.video_server.start_server())
     
     def camera_callback(self):
         ret, frame = self.cap.read()
@@ -214,12 +310,15 @@ class YOLOSearchTrackNode(Node):
             self.get_logger().error('Failed to capture frame')
             return
         
-        run_inference = self.state != "WAITING"
+        if self.state == "WAITING" or self.state == "ROTATING":
+            run_inference = False
+        else:
+            run_inference = True
         detected_objects, display_frame, rect_bounds = self.object_detection(frame, run_inference)
         current_time = time.time()
         
         if self.state == "WAITING":
-            self.get_logger().info("Waiting...")
+            self.log_info("Waiting...")
             # Just update display, no movement
             if detected_objects:
                 for obj in detected_objects:
@@ -230,24 +329,27 @@ class YOLOSearchTrackNode(Node):
             if detected_objects:
                 self.state = "TRACKING"
                 self.last_tracking_time = current_time
-                self.get_logger().info('Object detected, starting tracking')
-            elif current_time - self.detection_start_time >= 3.0:
+                self.log_info('Object detected, starting tracking')
+            elif current_time - self.detection_start_time >= 5.0:
                 self.start_rotation()
                 self.detection_start_time = current_time
         
         elif self.state == "ROTATING":
+            self.start_rotation()
             if self.start_yaw is not None:
                 angle_diff = ((self.my_yaw - self.start_yaw) + 360) % 360
-                self.get_logger().info(f"Angle diff= {angle_diff}")
-                self.get_logger().info(f"Total rotation= {self.total_rotation}")
+                self.log_info(f"Angle diff= {angle_diff}")
+                self.log_info(f"Total rotation= {self.total_rotation}")
                 if angle_diff >= 60.0 and angle_diff < 350.0:
                     self.total_rotation += 60.0
                     if self.total_rotation >= 360.0:
-                        self.get_logger().info('360 rotation done, Object not found. Waiting for next decision.')
+                        self.log_info('360 rotation done, Object not found. Waiting for next decision.')
                         msg = Twist()
                         self.vel_publisher.publish(msg)
                         self.state = "WAITING"
-                        self.point_publish_cmd.publish(String(data="go to point"))
+                        # self.point_publish_cmd.publish(String(data="go to point"))
+                        
+                        self.publish_target_reached()
                         return
                     
                     msg = Twist()
@@ -269,8 +371,8 @@ class YOLOSearchTrackNode(Node):
                 distance = self.calculate_distance(bbox_height)
                 instruction = self.get_movement_instruction(center, rect_bounds, distance)
                 
-                self.get_logger().info(f"Distance to object: {distance:.2f} m")
-                self.get_logger().info(f"Movement instruction: {instruction}")
+                self.log_info(f"Distance to object: {distance:.2f} m")
+                self.log_info(f"Movement instruction: {instruction}")
                 
                 target_reached = self.publish_movement_command(instruction)
                 
@@ -296,8 +398,14 @@ class YOLOSearchTrackNode(Node):
         # Display state
         cv2.putText(display_frame, f"State: {self.state}", 
                     (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
+
+         # Display state (Sending to websocket server)
+        try:
+            self.video_server.update_frame(display_frame)
+        except Exception as e:
+            self.get_logger().error(f"Error updating frame for WebSocket: {e}")
         
-        cv2.imshow('Mallet Search and Track', display_frame)
+        # cv2.imshow('Mallet Search and Track', display_frame)
         cv2.waitKey(1)
     
     def __del__(self):
